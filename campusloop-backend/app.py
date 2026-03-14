@@ -1,15 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager
-from flask_socketio import SocketIO
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 from config import Config
-
-db = SQLAlchemy()
-jwt = JWTManager()
-socketio = SocketIO()
-migrate = Migrate()
+from extensions import db, jwt, socketio, migrate
 
 def create_app():
     app = Flask(__name__)
@@ -21,8 +13,10 @@ def create_app():
     CORS(app, origins=[app.config["FRONTEND_URL"]])
     socketio.init_app(app, cors_allowed_origins=app.config["FRONTEND_URL"])
 
-    # Import models here so Flask-Migrate can detect them
     from models.user import User
+
+    from routes.auth import auth_bp
+    app.register_blueprint(auth_bp, url_prefix="/api/auth")
 
     return app
 

@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from app import db
+from extensions import db
 
 class User(db.Model):
     __tablename__ = "users"
