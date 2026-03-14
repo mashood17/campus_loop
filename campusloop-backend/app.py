@@ -10,8 +10,8 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app, db)
-    CORS(app, origins=[app.config["FRONTEND_URL"]])
-    socketio.init_app(app, cors_allowed_origins=app.config["FRONTEND_URL"])
+    CORS(app, origins="*")
+    socketio.init_app(app, cors_allowed_origins="*")
 
     from models.user import User
 
