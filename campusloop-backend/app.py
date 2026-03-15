@@ -14,9 +14,12 @@ def create_app():
     socketio.init_app(app, cors_allowed_origins="*")
 
     from models.user import User
+    from models.post import Post
 
     from routes.auth import auth_bp
+    from routes.posts import posts_bp
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
+    app.register_blueprint(posts_bp, url_prefix="/api/posts")
 
     return app
 
