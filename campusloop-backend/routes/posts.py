@@ -1,8 +1,9 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from extensions import db
+from extensions import db, socketio
 from models.post import Post
 from models.user import User
+from models.notification import Notification
 
 posts_bp = Blueprint("posts", __name__)
 
@@ -31,6 +32,34 @@ def create_post():
 
     db.session.add(post)
     db.session.commit()
+
+    # Create notifications for branch users
+    if "ALL" in post.branch_target:
+        target_users = User.query.filter(User.id != user_id).all()
+    else:
+        target_users = User.query.filter(
+            User.branch.in_(post.branch_target),
+            User.id != user_id
+        ).all()
+
+    for target_user in target_users:
+        notification = Notification(
+            user_id=target_user.id,
+            post_id=post.id,
+            message=f"New {post.category} post: {post.title}"
+        )
+        db.session.add(notification)
+
+    db.session.commit()
+
+    # Emit real-time events
+    for branch in post.branch_target:
+        socketio.emit("new_post", {
+            "title": post.title,
+            "category": post.category,
+            "author": post.author.name
+        }, room=branch)
+        socketio.emit("notification_update", room=branch)
 
     return jsonify({
         "message": "Post created successfully",

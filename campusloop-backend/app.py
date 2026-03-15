@@ -15,11 +15,17 @@ def create_app():
 
     from models.user import User
     from models.post import Post
+    from models.notification import Notification
 
     from routes.auth import auth_bp
     from routes.posts import posts_bp
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
     app.register_blueprint(posts_bp, url_prefix="/api/posts")
+
+    from sockets.events import handle_connect, handle_join_branch, handle_disconnect
+
+    from routes.notifications import notifications_bp
+    app.register_blueprint(notifications_bp, url_prefix="/api/notifications")
 
     return app
 

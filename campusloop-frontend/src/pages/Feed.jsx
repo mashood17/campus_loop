@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 import PostCard from "../components/PostCard";
+import NotificationBell from "../components/NotificationBell";
+
 
 const CATEGORIES = ["all", "opportunity", "resource", "event", "project", "placement"];
 
@@ -38,6 +40,7 @@ export default function Feed() {
         <h1 className="text-xl font-bold text-blue-600">CampusLoop</h1>
         <div className="flex items-center gap-4">
           <span className="text-sm text-gray-600">{user?.name} • {user?.branch}</span>
+          <NotificationBell />
           <button
             onClick={logout}
             className="text-sm text-red-500 hover:underline"
