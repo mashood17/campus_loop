@@ -4,6 +4,7 @@ import { SocketProvider } from "./context/SocketContext";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Feed from "./pages/Feed";
+import TechMap from "./pages/TechMap";
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -20,9 +21,10 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/feed" element={
-              <ProtectedRoute>
-                <Feed />
-              </ProtectedRoute>
+              <ProtectedRoute><Feed /></ProtectedRoute>
+            } />
+            <Route path="/techmap" element={
+              <ProtectedRoute><TechMap /></ProtectedRoute>
             } />
             <Route path="/" element={<Navigate to="/login" />} />
           </Routes>
