@@ -4,6 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 import PostCard from "../components/PostCard";
 import NotificationBell from "../components/NotificationBell";
+import Navbar from "../components/Navbar";
+
 
 const TABS = ["saved", "your posts", "edit profile"];
 
@@ -78,29 +80,8 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50">
 
       {/* Navbar */}
-      <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-6">
-          <h1
-            onClick={() => navigate("/feed")}
-            className="text-xl font-bold text-blue-600 cursor-pointer"
-          >
-            CampusLoop
-          </h1>
-          <button
-            onClick={() => navigate("/techmap")}
-            className="text-sm font-medium text-gray-600 hover:text-blue-600 transition"
-          >
-            TechMap
-          </button>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">{user?.name}</span>
-          <NotificationBell />
-          <button onClick={logout} className="text-sm text-red-500 hover:underline">
-            Logout
-          </button>
-        </div>
-      </nav>
+      <Navbar />
+
 
       <div className="max-w-2xl mx-auto px-4 py-6">
 

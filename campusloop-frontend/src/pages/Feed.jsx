@@ -2,19 +2,16 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 import PostCard from "../components/PostCard";
-import NotificationBell from "../components/NotificationBell";
 import CreatePost from "../components/CreatePost";
-import { useNavigate } from "react-router-dom";
-
+import Navbar from "../components/Navbar";
 
 const CATEGORIES = ["all", "opportunity", "resource", "event", "project", "placement"];
 
 export default function Feed() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("all");
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPosts();
@@ -41,34 +38,9 @@ export default function Feed() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar />
 
-      {/* Navbar */}
-      <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-  <div className="flex items-center gap-6">
-    <h1 className="text-xl font-bold text-blue-600">CampusLoop</h1>
-    <button
-      onClick={() => navigate("/techmap")}
-      className="text-sm font-medium text-gray-600 hover:text-blue-600 transition"
-    >
-      TechMap
-    </button>
-    <button
-  onClick={() => navigate("/dashboard")}
-  className="text-sm font-medium text-gray-600 hover:text-blue-600 transition"
->
-  Dashboard
-</button>
-  </div>
-  <div className="flex items-center gap-4">
-    <span className="text-sm text-gray-600">{user?.name} • {user?.branch}</span>
-    <NotificationBell />
-    <button onClick={logout} className="text-sm text-red-500 hover:underline">
-      Logout
-    </button>
-  </div>
-</nav>
-
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
 
         {/* Create Post */}
         <div className="mb-6">

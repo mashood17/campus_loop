@@ -195,3 +195,39 @@ def toggle_bookmark(post_id):
     return jsonify({
         "bookmarked": bookmarked
     }), 200
+    
+
+# ─── SEARCH POSTS ────────────────────────────────────
+@posts_bp.route("/search", methods=["GET"])
+@jwt_required()
+def search_posts():
+    keyword = request.args.get("q", "").strip()
+    category = request.args.get("category")
+    branch = request.args.get("branch")
+
+    if not keyword:
+        return jsonify({"posts": []}), 200
+
+    query = Post.query.filter(
+        db.or_(
+            Post.title.ilike(f"%{keyword}%"),
+            Post.body.ilike(f"%{keyword}%")
+        )
+    )
+
+    if category:
+        query = query.filter_by(category=category)
+
+    if branch:
+        query = query.filter(
+            db.or_(
+                db.cast(branch, db.String) == db.any_(Post.branch_target),
+                db.cast("ALL", db.String) == db.any_(Post.branch_target)
+            )
+        )
+
+    posts = query.order_by(Post.created_at.desc()).all()
+
+    return jsonify({
+        "posts": [post.to_dict() for post in posts]
+    }), 200

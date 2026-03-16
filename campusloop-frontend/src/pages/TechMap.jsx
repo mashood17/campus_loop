@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
-import NotificationBell from "../components/NotificationBell";
+import Navbar from "../components/Navbar";
 
 const BRANCHES = ["All", "CSE", "ECE", "ME", "CE", "EEE"];
 const POPULAR_SKILLS = ["React", "Python", "Flutter", "Java", "Node.js", "ML", "Django", "Firebase"];
 
 export default function TechMap() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [skillFilter, setSkillFilter] = useState("");
@@ -44,28 +42,9 @@ export default function TechMap() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar />
 
-      {/* Navbar */}
-      <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-6">
-          <h1
-            onClick={() => navigate("/feed")}
-            className="text-xl font-bold text-blue-600 cursor-pointer"
-          >
-            CampusLoop
-          </h1>
-          <span className="text-sm font-semibold text-gray-700">TechMap</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">{user?.name}</span>
-          <NotificationBell />
-          <button onClick={logout} className="text-sm text-red-500 hover:underline">
-            Logout
-          </button>
-        </div>
-      </nav>
-
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
 
         {/* Header */}
         <div className="mb-6">
@@ -132,7 +111,6 @@ export default function TechMap() {
               </button>
             ))}
 
-            {/* Collab toggle */}
             <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer ml-2">
               <input
                 type="checkbox"
@@ -158,7 +136,7 @@ export default function TechMap() {
             No students found with that filter
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {users.map((u) => (
               <StudentCard key={u.id} student={u} currentUserId={user?.id} />
             ))}
@@ -174,8 +152,6 @@ function StudentCard({ student, currentUserId }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition">
-
-      {/* Top row */}
       <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="font-semibold text-gray-800">
@@ -197,12 +173,10 @@ function StudentCard({ student, currentUserId }) {
         </span>
       </div>
 
-      {/* Bio */}
       {student.bio && (
         <p className="text-xs text-gray-500 mb-3 line-clamp-2">{student.bio}</p>
       )}
 
-      {/* Skills */}
       <div className="flex flex-wrap gap-1 mb-3">
         {(student.skills || []).map((skill) => (
           <span

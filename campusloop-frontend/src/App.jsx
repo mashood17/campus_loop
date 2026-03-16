@@ -6,6 +6,8 @@ import Login from "./pages/Login";
 import Feed from "./pages/Feed";
 import TechMap from "./pages/TechMap";
 import Dashboard from "./pages/Dashboard";
+import Search from "./pages/Search";
+
 
 
 function ProtectedRoute({ children }) {
@@ -30,6 +32,7 @@ function App() {
             } />
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
           </Routes>
         </SocketProvider>
       </AuthProvider>

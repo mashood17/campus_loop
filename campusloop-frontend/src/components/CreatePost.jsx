@@ -81,8 +81,7 @@ export default function CreatePost({ onPostCreated }) {
       {/* Modal Overlay */}
       {open && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
-
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 p-5 sm:p-6 max-h-screen overflow-y-auto">
             {/* Header */}
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-800">Create Post</h2>

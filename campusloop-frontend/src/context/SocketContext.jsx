@@ -11,8 +11,9 @@ export function SocketProvider({ children }) {
   useEffect(() => {
     if (!user) return;
 
-    const newSocket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000");
-
+const newSocket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:5000", {
+  transports: ["polling"]
+});
     newSocket.on("connect", () => {
       console.log("Socket connected");
       // Join branch room

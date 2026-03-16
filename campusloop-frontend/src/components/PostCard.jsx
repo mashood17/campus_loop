@@ -48,8 +48,7 @@ export default function PostCard({ post }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition">
-
+  <div className="flex flex-wrap items-center justify-between gap-2">
       {/* Top row */}
       <div className="flex items-center justify-between mb-3">
         <span className={`text-xs font-semibold px-3 py-1 rounded-full capitalize ${CATEGORY_COLORS[post.category] || "bg-gray-100 text-gray-600"}`}>
@@ -92,7 +91,6 @@ export default function PostCard({ post }) {
           </button>
 
           {/* Bookmark */}
-          
           <button
             onClick={handleBookmark}
             className={`text-xs font-semibold px-3 py-1 rounded-full transition
