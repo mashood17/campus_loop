@@ -4,6 +4,8 @@ from extensions import db, socketio
 from models.post import Post
 from models.user import User
 from models.notification import Notification
+from models.upvote import Upvote
+from models.bookmark import Bookmark
 
 posts_bp = Blueprint("posts", __name__)
 
@@ -73,10 +75,9 @@ def create_post():
 def get_feed():
     user_id = get_jwt_identity()
     user = User.query.get(user_id)
-
     category = request.args.get("category")
 
-    posts = Post.query.filter(
+    posts_query = Post.query.filter(
         db.or_(
             db.cast(user.branch, db.String) == db.any_(Post.branch_target),
             db.cast("ALL", db.String) == db.any_(Post.branch_target)
@@ -84,13 +85,29 @@ def get_feed():
     )
 
     if category:
-        posts = posts.filter_by(category=category)
+        posts_query = posts_query.filter_by(category=category)
 
-    posts = posts.order_by(Post.created_at.desc()).all()
+    posts = posts_query.order_by(Post.created_at.desc()).all()
 
-    return jsonify({
-        "posts": [post.to_dict() for post in posts]
-    }), 200
+    # Get user's upvotes and bookmarks for these posts
+    post_ids = [p.id for p in posts]
+    user_upvotes = {u.post_id for u in Upvote.query.filter(
+        Upvote.user_id == user_id,
+        Upvote.post_id.in_(post_ids)
+    ).all()}
+    user_bookmarks = {b.post_id for b in Bookmark.query.filter(
+        Bookmark.user_id == user_id,
+        Bookmark.post_id.in_(post_ids)
+    ).all()}
+
+    result = []
+    for post in posts:
+        post_dict = post.to_dict()
+        post_dict["is_upvoted"] = post.id in user_upvotes
+        post_dict["is_bookmarked"] = post.id in user_bookmarks
+        result.append(post_dict)
+
+    return jsonify({"posts": result}), 200
 
 
 # ─── GET SINGLE POST ─────────────────────────────────
@@ -119,3 +136,62 @@ def delete_post(post_id):
     db.session.commit()
 
     return jsonify({"message": "Post deleted"}), 200
+
+
+# ─── TOGGLE UPVOTE ───────────────────────────────────
+@posts_bp.route("/<post_id>/upvote", methods=["POST"])
+@jwt_required()
+def toggle_upvote(post_id):
+    user_id = get_jwt_identity()
+
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({"error": "Post not found"}), 404
+
+    existing = Upvote.query.filter_by(user_id=user_id, post_id=post_id).first()
+
+    if existing:
+        # Remove upvote
+        db.session.delete(existing)
+        post.upvote_count = max(0, post.upvote_count - 1)
+        upvoted = False
+    else:
+        # Add upvote
+        upvote = Upvote(user_id=user_id, post_id=post_id)
+        db.session.add(upvote)
+        post.upvote_count += 1
+        upvoted = True
+
+    db.session.commit()
+
+    return jsonify({
+        "upvoted": upvoted,
+        "upvote_count": post.upvote_count
+    }), 200
+
+
+# ─── TOGGLE BOOKMARK ─────────────────────────────────
+@posts_bp.route("/<post_id>/bookmark", methods=["POST"])
+@jwt_required()
+def toggle_bookmark(post_id):
+    user_id = get_jwt_identity()
+
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({"error": "Post not found"}), 404
+
+    existing = Bookmark.query.filter_by(user_id=user_id, post_id=post_id).first()
+
+    if existing:
+        db.session.delete(existing)
+        bookmarked = False
+    else:
+        bookmark = Bookmark(user_id=user_id, post_id=post_id)
+        db.session.add(bookmark)
+        bookmarked = True
+
+    db.session.commit()
+
+    return jsonify({
+        "bookmarked": bookmarked
+    }), 200

@@ -16,7 +16,10 @@ def create_app():
     from models.user import User
     from models.post import Post
     from models.notification import Notification
+    from models.upvote import Upvote
+    from models.bookmark import Bookmark
 
+    
     from routes.auth import auth_bp
     from routes.posts import posts_bp
     app.register_blueprint(auth_bp, url_prefix="/api/auth")
