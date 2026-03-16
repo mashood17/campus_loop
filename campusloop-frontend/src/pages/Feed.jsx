@@ -52,6 +52,12 @@ export default function Feed() {
     >
       TechMap
     </button>
+    <button
+  onClick={() => navigate("/dashboard")}
+  className="text-sm font-medium text-gray-600 hover:text-blue-600 transition"
+>
+  Dashboard
+</button>
   </div>
   <div className="flex items-center gap-4">
     <span className="text-sm text-gray-600">{user?.name} • {user?.branch}</span>

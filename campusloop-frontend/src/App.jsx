@@ -5,6 +5,8 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Feed from "./pages/Feed";
 import TechMap from "./pages/TechMap";
+import Dashboard from "./pages/Dashboard";
+
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -27,6 +29,7 @@ function App() {
               <ProtectedRoute><TechMap /></ProtectedRoute>
             } />
             <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           </Routes>
         </SocketProvider>
       </AuthProvider>
