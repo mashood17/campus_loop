@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 import PostCard from "../components/PostCard";
 import NotificationBell from "../components/NotificationBell";
-
+import CreatePost from "../components/CreatePost";
 
 const CATEGORIES = ["all", "opportunity", "resource", "event", "project", "placement"];
 
@@ -32,6 +32,10 @@ export default function Feed() {
     }
   };
 
+  const handlePostCreated = (newPost) => {
+    setPosts([newPost, ...posts]);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
 
@@ -51,6 +55,11 @@ export default function Feed() {
       </nav>
 
       <div className="max-w-2xl mx-auto px-4 py-6">
+
+        {/* Create Post */}
+        <div className="mb-6">
+          <CreatePost onPostCreated={handlePostCreated} />
+        </div>
 
         {/* Category Filter */}
         <div className="flex gap-2 overflow-x-auto pb-2 mb-6">
