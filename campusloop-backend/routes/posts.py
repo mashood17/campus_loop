@@ -231,3 +231,34 @@ def search_posts():
     return jsonify({
         "posts": [post.to_dict() for post in posts]
     }), 200
+    
+    
+# ─── GET PLACEMENT POSTS ─────────────────────────────
+@posts_bp.route("/placement", methods=["GET"])
+@jwt_required()
+def get_placement_posts():
+    company = request.args.get("company")
+
+    query = Post.query.filter_by(category="placement")
+
+    if company:
+        query = query.filter(Post.company_name.ilike(f"%{company}%"))
+
+    posts = query.order_by(Post.upvote_count.desc()).all()
+
+    return jsonify({
+        "posts": [post.to_dict() for post in posts]
+    }), 200
+
+
+# ─── GET ALL COMPANIES ────────────────────────────────
+@posts_bp.route("/companies", methods=["GET"])
+@jwt_required()
+def get_companies():
+    results = db.session.query(Post.company_name)\
+        .filter(Post.category == "placement")\
+        .filter(Post.company_name != None)\
+        .distinct().all()
+
+    companies = [r[0] for r in results if r[0]]
+    return jsonify({"companies": companies}), 200

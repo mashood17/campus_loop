@@ -16,6 +16,7 @@ export default function CreatePost({ onPostCreated }) {
     branch_target: ["ALL"],
     deadline: "",
     is_anonymous: false,
+    company_name: "",
   });
 
   const handleChange = (e) => {
@@ -49,6 +50,7 @@ export default function CreatePost({ onPostCreated }) {
       const payload = {
         ...formData,
         deadline: formData.deadline || null,
+        company_name: formData.company_name || null,
       };
       const res = await api.post("/api/posts/create", payload);
       onPostCreated(res.data.post);
@@ -60,6 +62,7 @@ export default function CreatePost({ onPostCreated }) {
         branch_target: ["ALL"],
         deadline: "",
         is_anonymous: false,
+        company_name: "",
       });
     } catch (err) {
       setError(err.response?.data?.error || "Something went wrong");
@@ -81,7 +84,8 @@ export default function CreatePost({ onPostCreated }) {
       {/* Modal Overlay */}
       {open && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-4">
-        <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 p-5 sm:p-6 max-h-screen overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 p-5 sm:p-6 max-h-screen overflow-y-auto">
+
             {/* Header */}
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-800">Create Post</h2>
@@ -141,6 +145,18 @@ export default function CreatePost({ onPostCreated }) {
                 rows={4}
                 className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
+
+              {/* Company Name — only for placement */}
+              {formData.category === "placement" && (
+                <input
+                  type="text"
+                  name="company_name"
+                  placeholder="Company name — e.g. Infosys, TCS, Google"
+                  value={formData.company_name}
+                  onChange={handleChange}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              )}
 
               {/* Branch Target */}
               <div>

@@ -46,6 +46,12 @@ export default function Navbar() {
           >
             Dashboard
           </button>
+           <button
+              onClick={() => navigate("/placement")}
+              className="text-sm font-medium text-gray-600 hover:text-blue-600 transition"
+            >
+              PlacementHub
+            </button>
         </div>
 
         {/* Right */}
@@ -69,6 +75,7 @@ export default function Navbar() {
             >
               Logout
             </button>
+           
           </div>
         </div>
       </div>
@@ -102,11 +109,18 @@ export default function Navbar() {
             Dashboard
           </button>
           <button
+            onClick={() => { navigate("/placement"); setMenuOpen(false); }}
+            className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg"
+          >
+            PlacementHub
+          </button>
+          <button
             onClick={logout}
             className="block w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg"
           >
             Logout
           </button>
+          
         </div>
       )}
     </nav>

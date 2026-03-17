@@ -7,6 +7,7 @@ import Feed from "./pages/Feed";
 import TechMap from "./pages/TechMap";
 import Dashboard from "./pages/Dashboard";
 import Search from "./pages/Search";
+import PlacementHub from "./pages/PlacementHub";
 
 
 
@@ -33,6 +34,8 @@ function App() {
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/search" element={<ProtectedRoute><Search /></ProtectedRoute>} />
+            <Route path="/placement" element={<ProtectedRoute><PlacementHub /></ProtectedRoute>} />
+
           </Routes>
         </SocketProvider>
       </AuthProvider>
