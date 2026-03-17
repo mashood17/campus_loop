@@ -34,6 +34,10 @@ def create_app():
 
     from sockets.events import handle_connect, handle_join_branch, handle_disconnect
 
+    with app.app_context():
+        from flask_migrate import upgrade
+        upgrade()
+
     return app
 
 app = create_app()
