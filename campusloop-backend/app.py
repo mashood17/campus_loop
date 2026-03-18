@@ -37,6 +37,10 @@ def create_app():
     with app.app_context():
         from flask_migrate import upgrade
         upgrade()
+        
+    @app.route("/")
+    def health():
+        return {"status": "CampusLoop API is running"}, 200
 
     return app
 
