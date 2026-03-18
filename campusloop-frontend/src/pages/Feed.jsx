@@ -38,15 +38,29 @@ export default function Feed() {
   };
 
   const handlePostCreated = (newPost) => {
-    setPosts([newPost, ...posts]);
+    setPosts(prev => [newPost, ...prev]);
     showToast("Post shared successfully! 🎉");
+  };
+
+  const handleDeletePost = (postId) => {
+    setPosts(prev => prev.filter(p => p.id !== postId));
+  };
+
+  const handleEditPost = (postId, updatedPost) => {
+    setPosts(prev => prev.map(p => p.id === postId ? updatedPost : p));
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={hideToast}
+        />
+      )}
 
       <div className="max-w-2xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
 
@@ -56,7 +70,7 @@ export default function Feed() {
         </div>
 
         {/* Category Filter */}
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-6">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
@@ -81,12 +95,17 @@ export default function Feed() {
           <EmptyState
             emoji="📬"
             title="No posts yet"
-            subtitle="Be the first to share an opportunity or resource with your branch!"
+            subtitle="Be the first to share an opportunity or resource!"
           />
         ) : (
           <div className="space-y-4">
             {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
+              <PostCard
+                key={post.id}
+                post={post}
+                onDelete={handleDeletePost}
+                onEdit={handleEditPost}
+              />
             ))}
           </div>
         )}

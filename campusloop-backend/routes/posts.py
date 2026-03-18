@@ -9,6 +9,7 @@ from models.bookmark import Bookmark
 
 posts_bp = Blueprint("posts", __name__)
 
+
 # ─── CREATE POST ─────────────────────────────────────
 @posts_bp.route("/create", methods=["POST"])
 @jwt_required()
@@ -29,7 +30,8 @@ def create_post():
         branch_target=data.get("branch_target", ["ALL"]),
         year_target=data.get("year_target", None),
         deadline=data.get("deadline", None),
-        is_anonymous=data.get("is_anonymous", False)
+        is_anonymous=data.get("is_anonymous", False),
+        company_name=data.get("company_name", None)
     )
 
     db.session.add(post)
@@ -54,7 +56,7 @@ def create_post():
 
     db.session.commit()
 
-    # Emit real-time events
+    # Emit real-time events to branch rooms
     for branch in post.branch_target:
         socketio.emit("new_post", {
             "title": post.title,
@@ -89,7 +91,6 @@ def get_feed():
 
     posts = posts_query.order_by(Post.created_at.desc()).all()
 
-    # Get user's upvotes and bookmarks for these posts
     post_ids = [p.id for p in posts]
     user_upvotes = {u.post_id for u in Upvote.query.filter(
         Upvote.user_id == user_id,
@@ -110,32 +111,55 @@ def get_feed():
     return jsonify({"posts": result}), 200
 
 
-# ─── GET SINGLE POST ─────────────────────────────────
-@posts_bp.route("/<post_id>", methods=["GET"])
+# ─── SINGLE POST — GET, EDIT, DELETE ─────────────────
+@posts_bp.route("/<post_id>", methods=["GET", "PUT", "DELETE"])
 @jwt_required()
-def get_post(post_id):
-    post = Post.query.get(post_id)
-    if not post:
-        return jsonify({"error": "Post not found"}), 404
-    return jsonify({"post": post.to_dict()}), 200
-
-
-# ─── DELETE POST ─────────────────────────────────────
-@posts_bp.route("/<post_id>", methods=["DELETE"])
-@jwt_required()
-def delete_post(post_id):
+def handle_post(post_id):
     user_id = get_jwt_identity()
     post = Post.query.get(post_id)
 
     if not post:
         return jsonify({"error": "Post not found"}), 404
-    if post.user_id != user_id:
-        return jsonify({"error": "Unauthorized"}), 403
 
-    db.session.delete(post)
-    db.session.commit()
+    # ── GET ──────────────────────────────────────────
+    if request.method == "GET":
+        return jsonify({"post": post.to_dict()}), 200
 
-    return jsonify({"message": "Post deleted"}), 200
+    # ── DELETE ───────────────────────────────────────
+    if request.method == "DELETE":
+        if post.user_id != user_id:
+            return jsonify({"error": "Unauthorized"}), 403
+
+        # Delete related notifications, upvotes, bookmarks first
+        Notification.query.filter_by(post_id=post_id).delete()
+        Upvote.query.filter_by(post_id=post_id).delete()
+        Bookmark.query.filter_by(post_id=post_id).delete()
+
+        db.session.delete(post)
+        db.session.commit()
+        return jsonify({"message": "Post deleted successfully"}), 200
+
+    # ── PUT (EDIT) ────────────────────────────────────
+    if request.method == "PUT":
+        if post.user_id != user_id:
+            return jsonify({"error": "Unauthorized"}), 403
+
+        data = request.get_json()
+
+        if data.get("title"):
+            post.title = data["title"]
+        if data.get("body"):
+            post.body = data["body"]
+        if data.get("deadline") is not None:
+            post.deadline = data["deadline"] or None
+        if data.get("company_name") is not None:
+            post.company_name = data["company_name"] or None
+
+        db.session.commit()
+        return jsonify({
+            "message": "Post updated successfully",
+            "post": post.to_dict()
+        }), 200
 
 
 # ─── TOGGLE UPVOTE ───────────────────────────────────
@@ -143,27 +167,24 @@ def delete_post(post_id):
 @jwt_required()
 def toggle_upvote(post_id):
     user_id = get_jwt_identity()
-
     post = Post.query.get(post_id)
+
     if not post:
         return jsonify({"error": "Post not found"}), 404
 
     existing = Upvote.query.filter_by(user_id=user_id, post_id=post_id).first()
 
     if existing:
-        # Remove upvote
         db.session.delete(existing)
         post.upvote_count = max(0, post.upvote_count - 1)
         upvoted = False
     else:
-        # Add upvote
         upvote = Upvote(user_id=user_id, post_id=post_id)
         db.session.add(upvote)
         post.upvote_count += 1
         upvoted = True
 
     db.session.commit()
-
     return jsonify({
         "upvoted": upvoted,
         "upvote_count": post.upvote_count
@@ -175,8 +196,8 @@ def toggle_upvote(post_id):
 @jwt_required()
 def toggle_bookmark(post_id):
     user_id = get_jwt_identity()
-
     post = Post.query.get(post_id)
+
     if not post:
         return jsonify({"error": "Post not found"}), 404
 
@@ -191,11 +212,8 @@ def toggle_bookmark(post_id):
         bookmarked = True
 
     db.session.commit()
+    return jsonify({"bookmarked": bookmarked}), 200
 
-    return jsonify({
-        "bookmarked": bookmarked
-    }), 200
-    
 
 # ─── SEARCH POSTS ────────────────────────────────────
 @posts_bp.route("/search", methods=["GET"])
@@ -227,28 +245,21 @@ def search_posts():
         )
 
     posts = query.order_by(Post.created_at.desc()).all()
+    return jsonify({"posts": [post.to_dict() for post in posts]}), 200
 
-    return jsonify({
-        "posts": [post.to_dict() for post in posts]
-    }), 200
-    
-    
+
 # ─── GET PLACEMENT POSTS ─────────────────────────────
 @posts_bp.route("/placement", methods=["GET"])
 @jwt_required()
 def get_placement_posts():
     company = request.args.get("company")
-
     query = Post.query.filter_by(category="placement")
 
     if company:
         query = query.filter(Post.company_name.ilike(f"%{company}%"))
 
     posts = query.order_by(Post.upvote_count.desc()).all()
-
-    return jsonify({
-        "posts": [post.to_dict() for post in posts]
-    }), 200
+    return jsonify({"posts": [post.to_dict() for post in posts]}), 200
 
 
 # ─── GET ALL COMPANIES ────────────────────────────────

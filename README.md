@@ -228,10 +228,6 @@ pytest tests/ -v
 
 ---
 
-## 📄 License
 
-MIT — feel free to fork and adapt for your own college.
-
----
 
 > Built as a full-stack portfolio project demonstrating real-time web development with React, Flask, PostgreSQL, and WebSockets.
