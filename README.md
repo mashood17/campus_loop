@@ -196,16 +196,20 @@ pytest tests/ -v
 ## 📸 Screenshots
 
 ### Feed
-> Real-time post feed with category filters, upvotes, and bookmarks
+<img width="1433" height="871" alt="image" src="https://github.com/user-attachments/assets/482d654a-0ff6-4cee-b78e-b51bd6d00bf8" />
+<img width="1480" height="871" alt="image" src="https://github.com/user-attachments/assets/85fae7d2-f6ac-434a-a2e0-d19df52f63bc" />
+
 
 ### TechMap
-> Student skills directory filterable by technology and branch
+<img width="1481" height="793" alt="image" src="https://github.com/user-attachments/assets/7d0fdf02-a54a-4837-9e28-98f7f4bcc644" />
 
 ### PlacementHub
-> Company-specific interview experiences with anonymous posting
+<img width="1703" height="569" alt="image" src="https://github.com/user-attachments/assets/5f21cade-f2a7-403b-a207-5484bd496378" />
 
 ### Dashboard
-> Personal saved posts, your posts, and profile editor
+<img width="1435" height="815" alt="image" src="https://github.com/user-attachments/assets/2c254187-f3d7-41cd-b068-3db3047da452" />
+<img width="1509" height="864" alt="image" src="https://github.com/user-attachments/assets/3e093fd9-4770-4c71-b6cd-2c75bf440e2a" />
+
 
 ---
 
@@ -227,7 +231,5 @@ pytest tests/ -v
 [![GitHub](https://img.shields.io/badge/GitHub-mashood17-black?logo=github)](https://github.com/mashood17)
 
 ---
-
-
 
 > Built as a full-stack portfolio project demonstrating real-time web development with React, Flask, PostgreSQL, and WebSockets.
