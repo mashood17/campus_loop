@@ -4,6 +4,7 @@ import Toast from "./Toast";
 import useToast from "../hooks/useToast";
 import { useAuth } from "../context/AuthContext";
 import timeAgo from "../utils/timeAgo";
+import Linkify from "../utils/linkify";
 
 const CATEGORY_COLORS = {
   opportunity: "bg-green-100 text-green-700",
@@ -160,7 +161,7 @@ export default function PostCard({ post, onDelete, onEdit }) {
         {/* Body — expandable */}
         <div className="mb-3">
           <p className={`text-sm text-gray-600 leading-relaxed ${!expanded && isLong ? "line-clamp-3" : ""}`}>
-            {post.body}
+            <Linkify text={post.body} />
           </p>
           {isLong && (
             <button
