@@ -30,9 +30,10 @@ export default function Login() {
       <div className="bg-white rounded-2xl shadow-md p-8 w-full max-w-md">
 
         {/* Header */}
-        <div className="mb-6 text-center">
+        <div className="mb-8 text-center">
+          <div className="text-4xl mb-2">🎓</div>
           <h1 className="text-3xl font-bold text-blue-600">CampusLoop</h1>
-          <p className="text-gray-500 mt-1">Welcome back</p>
+          <p className="text-gray-500 mt-1 text-sm">Your college intelligence platform</p>
         </div>
 
         {/* Error */}

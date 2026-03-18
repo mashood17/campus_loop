@@ -4,6 +4,10 @@ import api from "../utils/api";
 import PostCard from "../components/PostCard";
 import CreatePost from "../components/CreatePost";
 import Navbar from "../components/Navbar";
+import SkeletonCard from "../components/SkeletonCard";
+import EmptyState from "../components/EmptyState";
+import Toast from "../components/Toast";
+import useToast from "../hooks/useToast";
 
 const CATEGORIES = ["all", "opportunity", "resource", "event", "project", "placement"];
 
@@ -12,6 +16,7 @@ export default function Feed() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("all");
+  const { toast, showToast, hideToast } = useToast();
 
   useEffect(() => {
     fetchPosts();
@@ -34,11 +39,14 @@ export default function Feed() {
 
   const handlePostCreated = (newPost) => {
     setPosts([newPost, ...posts]);
+    showToast("Post shared successfully! 🎉");
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
+
+      {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
 
       <div className="max-w-2xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
 
@@ -48,7 +56,7 @@ export default function Feed() {
         </div>
 
         {/* Category Filter */}
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-6">
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
@@ -66,11 +74,15 @@ export default function Feed() {
 
         {/* Posts */}
         {loading ? (
-          <div className="text-center text-gray-400 py-12">Loading...</div>
-        ) : posts.length === 0 ? (
-          <div className="text-center text-gray-400 py-12">
-            No posts yet. Be the first to post!
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => <SkeletonCard key={i} />)}
           </div>
+        ) : posts.length === 0 ? (
+          <EmptyState
+            emoji="📬"
+            title="No posts yet"
+            subtitle="Be the first to share an opportunity or resource with your branch!"
+          />
         ) : (
           <div className="space-y-4">
             {posts.map((post) => (
