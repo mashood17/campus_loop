@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from config import Config
 from extensions import db, jwt, socketio, migrate
+from flask import jsonify
 
 def create_app():
     app = Flask(__name__)
@@ -40,8 +41,8 @@ def create_app():
         
     @app.route("/")
     def health():
-        return {"status": "CampusLoop API is running"}, 200
-
+        return jsonify({"status": "CampusLoop API is running ✅"}), 200
+    
     return app
 
 app = create_app()
