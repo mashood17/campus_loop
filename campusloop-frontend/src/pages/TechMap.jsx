@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 import Navbar from "../components/Navbar";
+import { Helmet } from 'react-helmet-async'
 
 const BRANCHES = ["All", "CSE", "ECE", "ME", "CE", "EEE"];
 const POPULAR_SKILLS = ["React", "Python", "Flutter", "Java", "Node.js", "ML", "Django", "Firebase"];
@@ -41,6 +42,9 @@ export default function TechMap() {
   };
 
   return (
+    <>
+    <Helmet><title>TechMap — CampusLoop</title></Helmet>
+
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
@@ -144,6 +148,7 @@ export default function TechMap() {
         )}
       </div>
     </div>
+    </>
   );
 }
 
@@ -152,14 +157,18 @@ function StudentCard({ student, currentUserId }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition">
+
+      {/* Top row */}
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className="font-semibold text-gray-800">
-            {student.name}
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-gray-800">{student.name}</h3>
             {isMe && (
-              <span className="ml-2 text-xs text-blue-600 font-normal">(you)</span>
+              <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium">
+                You
+              </span>
             )}
-          </h3>
+          </div>
           <p className="text-xs text-gray-500 mt-0.5">
             {student.branch} • Year {student.year}
           </p>
@@ -173,10 +182,12 @@ function StudentCard({ student, currentUserId }) {
         </span>
       </div>
 
+      {/* Bio */}
       {student.bio && (
         <p className="text-xs text-gray-500 mb-3 line-clamp-2">{student.bio}</p>
       )}
 
+      {/* Skills */}
       <div className="flex flex-wrap gap-1 mb-3">
         {(student.skills || []).map((skill) => (
           <span
@@ -190,6 +201,30 @@ function StudentCard({ student, currentUserId }) {
           <span className="text-xs text-gray-400">No skills added yet</span>
         )}
       </div>
+
+      {/* Action — only for other users */}
+      {!isMe && (
+        <div className="pt-3 border-t border-gray-50">
+          
+           <a href={`mailto:${student.email}`}
+            className="block w-full text-center text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 py-2 rounded-lg transition"
+          >
+            Connect via Email
+          </a>
+        </div>
+      )}
+
+      {/* If it's you — show edit profile link */}
+      {isMe && (
+        <div className="pt-3 border-t border-gray-50">
+          
+          <a  href="/dashboard"
+  className="block w-full text-center text-xs font-semibold text-gray-500 bg-gray-50 hover:bg-gray-100 py-2 rounded-lg transition"
+>
+  Edit your profile →
+</a>
+        </div>
+      )}
     </div>
   );
 }

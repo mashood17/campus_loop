@@ -3,6 +3,8 @@ import api from "../utils/api";
 
 const CATEGORIES = ["opportunity", "resource", "event", "project", "placement"];
 const BRANCHES = ["CSE", "ECE", "ME", "CE", "EEE"];
+const TITLE_MAX = 150;
+const BODY_MAX = 1000;
 
 export default function CreatePost({ onPostCreated }) {
   const [open, setOpen] = useState(false);
@@ -132,8 +134,12 @@ export default function CreatePost({ onPostCreated }) {
                 value={formData.title}
                 onChange={handleChange}
                 required
+                maxLength={TITLE_MAX}
                 className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              <p className={`text-xs mt-1 text-right ${formData.title.length > TITLE_MAX - 20 ? "text-orange-500" : "text-gray-400"}`}>
+                {formData.title.length}/{TITLE_MAX}
+              </p>
 
               {/* Body */}
               <textarea
@@ -142,9 +148,13 @@ export default function CreatePost({ onPostCreated }) {
                 value={formData.body}
                 onChange={handleChange}
                 required
+                maxLength={BODY_MAX}
                 rows={4}
                 className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
+              <p className={`text-xs mt-1 text-right ${formData.body.length > BODY_MAX - 100 ? "text-orange-500" : "text-gray-400"}`}>
+                {formData.body.length}/{BODY_MAX}
+              </p>
 
               {/* Company Name — only for placement */}
               {formData.category === "placement" && (

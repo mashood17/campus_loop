@@ -8,6 +8,8 @@ import SkeletonCard from "../components/SkeletonCard";
 import EmptyState from "../components/EmptyState";
 import Toast from "../components/Toast";
 import useToast from "../hooks/useToast";
+import { Helmet } from 'react-helmet-async'
+
 
 const CATEGORIES = ["all", "opportunity", "resource", "event", "project", "placement"];
 
@@ -20,6 +22,17 @@ export default function Feed() {
 
   useEffect(() => {
     fetchPosts();
+  }, [activeCategory]);
+
+  // Refresh feed when user navigates back to this page
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchPosts();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [activeCategory]);
 
   const fetchPosts = async () => {
@@ -51,6 +64,8 @@ export default function Feed() {
   };
 
   return (
+    <>
+    <Helmet><title>Feed — CampusLoop</title></Helmet>
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
@@ -111,5 +126,6 @@ export default function Feed() {
         )}
       </div>
     </div>
+    </>
   );
 }

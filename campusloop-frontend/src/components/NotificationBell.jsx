@@ -1,12 +1,23 @@
-import { useState, useEffect } from "react";
 import { useSocket } from "../context/SocketContext";
 import api from "../utils/api";
+import { useState, useEffect, useRef } from "react";
 
 export default function NotificationBell() {
   const { socket } = useSocket();
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [open, setOpen] = useState(false);
+  const bellRef = useRef(null);
+
+useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (bellRef.current && !bellRef.current.contains(e.target)) {
+      setOpen(false);
+    }
+  };
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+}, []);
 
   useEffect(() => {
     fetchNotifications();
@@ -46,7 +57,7 @@ export default function NotificationBell() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={bellRef}>
       {/* Bell button */}
       <button
         onClick={() => setOpen(!open)}

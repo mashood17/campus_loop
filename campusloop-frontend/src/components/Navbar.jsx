@@ -7,6 +7,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   return (
     <nav className="bg-white shadow-sm px-4 py-3 sticky top-0 z-40">
@@ -70,7 +71,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             <span className="text-sm text-gray-600">{user?.name}</span>
             <button
-              onClick={logout}
+              onClick={() => setShowLogoutConfirm(true)}
               className="text-sm text-red-500 hover:underline"
             >
               Logout
@@ -115,14 +116,41 @@ export default function Navbar() {
             PlacementHub
           </button>
           <button
-            onClick={logout}
-            className="block w-full text-left px-3 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg"
+            onClick={() => setShowLogoutConfirm(true)}
+            className="text-sm text-red-500 hover:underline"
           >
             Logout
           </button>
           
         </div>
       )}
+      {/* Logout Confirmation Modal */}
+{showLogoutConfirm && (
+  <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-4">
+    <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
+      <h3 className="text-lg font-bold text-gray-800 mb-2">
+        Log out?
+      </h3>
+      <p className="text-sm text-gray-500 mb-6">
+        You'll need to log back in to access your feed.
+      </p>
+      <div className="flex gap-3">
+        <button
+          onClick={() => setShowLogoutConfirm(false)}
+          className="flex-1 border border-gray-200 text-gray-600 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={() => { logout(); setShowLogoutConfirm(false); }}
+          className="flex-1 bg-red-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition"
+        >
+          Log out
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </nav>
   );
 }

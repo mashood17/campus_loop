@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Helmet } from 'react-helmet-async'
+
 
 export default function Register() {
   const { register } = useAuth();
@@ -35,6 +37,8 @@ export default function Register() {
   };
 
   return (
+    <>
+    <Helmet><title>Register — CampusLoop</title></Helmet>
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="bg-white rounded-2xl shadow-md p-8 w-full max-w-md">
         
@@ -126,5 +130,6 @@ export default function Register() {
         </p>
       </div>
     </div>
+    </>
   );
 }

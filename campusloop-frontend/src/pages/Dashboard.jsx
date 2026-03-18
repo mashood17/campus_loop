@@ -5,6 +5,7 @@ import api from "../utils/api";
 import PostCard from "../components/PostCard";
 import NotificationBell from "../components/NotificationBell";
 import Navbar from "../components/Navbar";
+import { Helmet } from 'react-helmet-async'
 
 
 const TABS = ["saved", "your posts", "edit profile"];
@@ -77,6 +78,9 @@ export default function Dashboard() {
   };
 
   return (
+    <>
+    <Helmet><title>Dashboard — CampusLoop</title></Helmet>
+    
     <div className="min-h-screen bg-gray-50">
 
       {/* Navbar */}
@@ -244,5 +248,6 @@ export default function Dashboard() {
         )}
       </div>
     </div>
+    </>
   );
 }

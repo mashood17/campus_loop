@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../utils/api";
 import Toast from "./Toast";
 import useToast from "../hooks/useToast";
 import { useAuth } from "../context/AuthContext";
+import timeAgo from "../utils/timeAgo";
 
 const CATEGORY_COLORS = {
   opportunity: "bg-green-100 text-green-700",
@@ -18,14 +19,27 @@ export default function PostCard({ post, onDelete, onEdit }) {
   const [isUpvoted, setIsUpvoted] = useState(post.is_upvoted || false);
   const [isBookmarked, setIsBookmarked] = useState(post.is_bookmarked || false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editTitle, setEditTitle] = useState(post.title);
   const [editBody, setEditBody] = useState(post.body);
   const [editLoading, setEditLoading] = useState(false);
   const { toast, showToast, hideToast } = useToast();
+  const menuRef = useRef(null);
 
   const isOwner = user?.id === post.user_id;
+  const isLong = post.body.length > 150;
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const isExpiringSoon = () => {
     if (!post.deadline) return false;
@@ -90,9 +104,11 @@ export default function PostCard({ post, onDelete, onEdit }) {
 
   return (
     <>
-      {toast && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
+      {toast && (
+        <Toast message={toast.message} type={toast.type} onClose={hideToast} />
+      )}
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition relative">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition">
 
         {/* Top row */}
         <div className="flex items-center justify-between mb-3">
@@ -106,32 +122,25 @@ export default function PostCard({ post, onDelete, onEdit }) {
               </span>
             )}
 
-            {/* Three dot menu — only for post owner */}
+            {/* Three dot menu — owner only */}
             {isOwner && (
-              <div className="relative">
+              <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
-                  className="text-gray-400 hover:text-gray-600 px-2 py-1 rounded-lg hover:bg-gray-100 transition text-lg font-bold"
+                  className="text-gray-400 hover:text-gray-600 px-2 py-1 rounded-lg hover:bg-gray-100 transition font-bold text-lg"
                 >
                   ⋮
                 </button>
-
                 {menuOpen && (
                   <div className="absolute right-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-gray-100 z-20">
                     <button
-                      onClick={() => {
-                        setShowEditModal(true);
-                        setMenuOpen(false);
-                      }}
+                      onClick={() => { setShowEditModal(true); setMenuOpen(false); }}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-t-xl"
                     >
                       ✏️ Edit post
                     </button>
                     <button
-                      onClick={() => {
-                        setShowDeleteConfirm(true);
-                        setMenuOpen(false);
-                      }}
+                      onClick={() => { setShowDeleteConfirm(true); setMenuOpen(false); }}
                       className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-b-xl"
                     >
                       🗑️ Delete post
@@ -144,17 +153,41 @@ export default function PostCard({ post, onDelete, onEdit }) {
         </div>
 
         {/* Title */}
-        <h2 className="text-base font-semibold text-gray-800 mb-1">{post.title}</h2>
+        <h2 className="text-base font-semibold text-gray-800 mb-2">
+          {post.title}
+        </h2>
 
-        {/* Body */}
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{post.body}</p>
+        {/* Body — expandable */}
+        <div className="mb-3">
+          <p className={`text-sm text-gray-600 leading-relaxed ${!expanded && isLong ? "line-clamp-3" : ""}`}>
+            {post.body}
+          </p>
+          {isLong && (
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="text-xs text-blue-500 font-semibold mt-1 hover:text-blue-700 transition"
+            >
+              {expanded ? "Show less ▲" : "Read more ▼"}
+            </button>
+          )}
+        </div>
+
+        {/* Company tag for placement */}
+        {post.company_name && (
+          <span className="inline-block bg-purple-50 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full mb-3">
+            {post.company_name}
+          </span>
+        )}
 
         {/* Bottom row */}
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-gray-50">
           <div className="text-xs text-gray-400">
             <span>{post.author_name} • {post.author_branch}</span>
+            <span className="ml-2">· {timeAgo(post.created_at)}</span>
             {post.deadline && (
-              <span className="ml-2">· Due: {new Date(post.deadline).toLocaleDateString()}</span>
+              <span className="ml-2">
+                · Due: {new Date(post.deadline).toLocaleDateString()}
+              </span>
             )}
           </div>
 
@@ -188,7 +221,9 @@ export default function PostCard({ post, onDelete, onEdit }) {
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
-            <h3 className="text-lg font-bold text-gray-800 mb-2">Delete Post?</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-2">
+              Delete Post?
+            </h3>
             <p className="text-sm text-gray-500 mb-6">
               This action cannot be undone. The post will be permanently deleted.
             </p>
@@ -223,7 +258,6 @@ export default function PostCard({ post, onDelete, onEdit }) {
                 ✕
               </button>
             </div>
-
             <div className="space-y-4">
               <input
                 type="text"
@@ -235,7 +269,7 @@ export default function PostCard({ post, onDelete, onEdit }) {
               <textarea
                 value={editBody}
                 onChange={(e) => setEditBody(e.target.value)}
-                rows={4}
+                rows={5}
                 className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 placeholder="Body"
               />

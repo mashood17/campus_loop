@@ -1,25 +1,19 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import api from "../utils/api";
 import PostCard from "../components/PostCard";
-import NotificationBell from "../components/NotificationBell";
 import Navbar from "../components/Navbar";
-
+import { Helmet } from "react-helmet-async";
 
 const CATEGORIES = ["all", "opportunity", "resource", "event", "project", "placement"];
 
 export default function Search() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const [query, setQuery] = useState(searchParams.get("q") || "");
+  const { user } = useAuth();
+  const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [activeCategory, setActiveCategory] = useState("all");
-
   const debounceRef = useRef(null);
 
   useEffect(() => {
@@ -28,13 +22,10 @@ export default function Search() {
       setSearched(false);
       return;
     }
-
-    // Debounce — wait 500ms after user stops typing
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       fetchResults(query, activeCategory);
     }, 500);
-
     return () => clearTimeout(debounceRef.current);
   }, [query, activeCategory]);
 
@@ -45,7 +36,6 @@ export default function Search() {
       const params = new URLSearchParams();
       params.append("q", q);
       if (cat !== "all") params.append("category", cat);
-
       const res = await api.get(`/api/posts/search?${params.toString()}`);
       setResults(res.data.posts);
     } catch (err) {
@@ -57,12 +47,10 @@ export default function Search() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-
-      {/* Navbar */}
+      <Helmet><title>Search — CampusLoop</title></Helmet>
       <Navbar />
 
-
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
 
         {/* Search Bar */}
         <div className="mb-6">

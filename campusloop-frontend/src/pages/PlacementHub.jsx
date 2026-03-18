@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../utils/api";
 import Navbar from "../components/Navbar";
+import { Helmet } from 'react-helmet-async'
 
 export default function PlacementHub() {
   const [posts, setPosts] = useState([]);
@@ -42,6 +43,8 @@ export default function PlacementHub() {
   };
 
   return (
+    <>
+    <Helmet><title>PlacementHub — CampusLoop</title></Helmet>
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
@@ -105,6 +108,8 @@ export default function PlacementHub() {
         )}
       </div>
     </div>
+    </>
+
   );
 }
 

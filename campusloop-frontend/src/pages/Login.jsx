@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Helmet } from 'react-helmet-async'
+
 
 export default function Login() {
   const { login } = useAuth();
@@ -26,6 +28,9 @@ export default function Login() {
   };
 
   return (
+    <>
+    <Helmet><title>Login — CampusLoop</title></Helmet>
+
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="bg-white rounded-2xl shadow-md p-8 w-full max-w-md">
 
@@ -80,5 +85,6 @@ export default function Login() {
         </p>
       </div>
     </div>
+    </>
   );
 }
